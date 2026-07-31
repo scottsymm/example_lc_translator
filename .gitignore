@@ -50,3 +50,15 @@ Thumbs.db
 # uv
 # Note: uv.lock is intentionally NOT ignored.
 # Commit it so the dependency environment is reproducible for every clone.
+
+# JavaScript / pnpm
+node_modules/
+pnpm-debug.log*
+.npm
+.yarn
+.yarnrc
+
+# Vite / React build output
+apps/web/dist/
+*.local
+.vite/
