@@ -2,19 +2,21 @@
 
 from __future__ import annotations
 
-from typing import Optional
+from typing import Any, Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from lc_translator_api.dependencies import get_db
 from lc_translator_api.repositories.record import RecordRepository
+from lc_translator_api.schemas.generate import GenerateRequest
 from lc_translator_api.schemas.record import (
     RecordCreate,
     RecordOut,
     RecordSummary,
     RecordUpdate,
 )
+from lc_translator_api.schemas.translate import TranslateRequest
 
 router = APIRouter(tags=["records"])
 
@@ -72,3 +74,27 @@ def delete_record(record_id: str, repo: RecordRepository = Depends(_get_reposito
     deleted = repo.delete(record_id)
     if not deleted:
         raise HTTPException(status_code=404, detail="Record not found")
+
+
+@router.post("/records/{record_id}/rerun")
+def rerun_record(record_id: str, repo: RecordRepository = Depends(_get_repository)) -> Any:
+    """Re-run the stored input through the engine and return fresh output."""
+    record = repo.get(record_id)
+    if record is None:
+        raise HTTPException(status_code=404, detail="Record not found")
+
+    if record.source_type == "generated":
+        from lc_translator_api.routers.generate import generate_endpoint
+
+        if record.generated_seed is None or record.generated_strict is None:
+            raise HTTPException(status_code=400, detail="Record missing generation parameters")
+        return generate_endpoint(GenerateRequest(seed=record.generated_seed, strict=record.generated_strict))
+
+    if record.source_type in {"translated", "validated"}:
+        from lc_translator_api.routers.translate import translate_endpoint
+
+        if record.mt700_input is None:
+            raise HTTPException(status_code=400, detail="Record missing MT700 input")
+        return translate_endpoint(TranslateRequest(mt700=record.mt700_input))
+
+    raise HTTPException(status_code=400, detail=f"Unsupported source_type: {record.source_type}")
