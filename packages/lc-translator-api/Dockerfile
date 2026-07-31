@@ -14,12 +14,16 @@ RUN apt-get update && apt-get install -y curl && \
 RUN pip install --no-cache-dir uv
 
 # Copy dependency manifests first for layer caching
-COPY pyproject.toml pnpm-workspace.yaml package.json ./
+COPY pyproject.toml pnpm-workspace.yaml package.json .npmrc uv.lock ./
 COPY packages/lc-translator-core/pyproject.toml packages/lc-translator-core/README.md ./packages/lc-translator-core/
 COPY packages/lc-translator-api/pyproject.toml packages/lc-translator-api/README.md ./packages/lc-translator-api/
 
 # Install Python dependencies
 RUN uv sync --extra dev
+
+# Copy JS dependency manifests
+COPY pnpm-lock.yaml ./
+COPY apps/web/package.json ./apps/web/
 
 # Install JS dependencies
 RUN pnpm install

@@ -24,3 +24,6 @@ build-backend = "hatchling.build"
 
 [tool.uv.sources]
 lc-translator-core = { workspace = true }
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/lc_translator_api"]
