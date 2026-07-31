@@ -18,6 +18,7 @@ class Settings(BaseSettings):
     static_dir: Optional[Path] = None
     xsd_path: Optional[Path] = None
     api_prefix: str = "/api"
+    database_url: str = "postgresql+psycopg://postgres:postgres@localhost:5432/lc_translator"
 
 
 @lru_cache
