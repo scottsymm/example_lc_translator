@@ -1,8 +1,7 @@
 import { useState } from "react";
 import { validateMt, validateMx } from "../api/client.js";
-import { saveToHistory } from "../lib/history.js";
+import { SaveRecordButton } from "../components/SaveRecordButton.jsx";
 import ValidationResult from "../components/ValidationResult.jsx";
-import HistoryPanel from "../components/HistoryPanel.jsx";
 
 export default function ValidatePage() {
   const [mode, setMode] = useState("mt");
@@ -17,12 +16,6 @@ export default function ValidatePage() {
     try {
       const data = mode === "mt" ? await validateMt(input) : await validateMx(input);
       setResult(data);
-      saveToHistory("validate", {
-        mode,
-        valid: data.valid,
-        errors: data.errors,
-        warnings: data.warnings,
-      });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -76,20 +69,29 @@ export default function ValidatePage() {
       {error && <p className="mt-4 text-red-600">{error}</p>}
 
       {result && (
-        <ValidationResult
-          result={{ valid: result.valid, errors: result.errors, warnings: result.warnings }}
-          title={mode === "mt" ? "MT700 Validation" : "MX XSD Validation"}
-        />
+        <>
+          <div className="mt-4">
+            <SaveRecordButton
+              record={{
+                source_type: "validated",
+                mt700_input: mode === "mt" ? input : undefined,
+                mx_xml: mode === "mx" ? input : undefined,
+                validation_result: {
+                  mt700_valid: mode === "mt" ? result.valid : undefined,
+                  mt700_errors: mode === "mt" ? result.errors : undefined,
+                  mt700_warnings: mode === "mt" ? result.warnings : undefined,
+                  mx_valid: mode === "mx" ? result.valid : undefined,
+                  mx_errors: mode === "mx" ? result.errors : undefined,
+                },
+              }}
+            />
+          </div>
+          <ValidationResult
+            result={{ valid: result.valid, errors: result.errors, warnings: result.warnings }}
+            title={mode === "mt" ? "MT700 Validation" : "MX XSD Validation"}
+          />
+        </>
       )}
-
-      <HistoryPanel
-        type="validate"
-        onSelect={(payload) => {
-          setMode(payload.mode);
-          setInput("");
-          setResult({ valid: payload.valid, errors: payload.errors || [], warnings: payload.warnings || [] });
-        }}
-      />
     </div>
   );
 }

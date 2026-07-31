@@ -4,6 +4,7 @@ import Header from "./components/Header.jsx";
 import GeneratePage from "./pages/GeneratePage.jsx";
 import TranslatePage from "./pages/TranslatePage.jsx";
 import ValidatePage from "./pages/ValidatePage.jsx";
+import { RecordsPage } from "./pages/RecordsPage.jsx";
 
 export default function App() {
   return (
@@ -14,6 +15,7 @@ export default function App() {
           <Route path="/" element={<GeneratePage />} />
           <Route path="/translate" element={<TranslatePage />} />
           <Route path="/validate" element={<ValidatePage />} />
+          <Route path="/records" element={<RecordsPage />} />
         </Routes>
       </main>
     </div>

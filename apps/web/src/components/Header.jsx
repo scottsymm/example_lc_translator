@@ -25,6 +25,9 @@ export default function Header() {
           <Link to="/validate" className={linkClass("/validate")}>
             Validate
           </Link>
+          <Link to="/records" className={linkClass("/records")}>
+            Records
+          </Link>
         </nav>
       </div>
     </header>
