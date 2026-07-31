@@ -11,14 +11,21 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from lc_translator_core.validation import XsdValidator
 
+from lc_translator_api.database import init_database
 from lc_translator_api.dependencies import get_settings_dependency
-from lc_translator_api.routers import generate_router, translate_router, validate_router
+from lc_translator_api.routers import (
+    generate_router,
+    records_router,
+    translate_router,
+    validate_router,
+)
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-    """Load the XSD schema once at startup."""
+    """Load the XSD schema and initialize the database engine once at startup."""
     settings = get_settings_dependency()
+    init_database(settings)
     app.state.xsd_schema = None
     validator = XsdValidator(xsd_path=settings.xsd_path) if settings.xsd_path else XsdValidator()
     if validator.is_available():
@@ -43,6 +50,7 @@ def create_app() -> FastAPI:
     app.include_router(generate_router, prefix=settings.api_prefix)
     app.include_router(translate_router, prefix=settings.api_prefix)
     app.include_router(validate_router, prefix=settings.api_prefix)
+    app.include_router(records_router, prefix=settings.api_prefix)
 
     if settings.static_dir and settings.static_dir.exists():
         app.mount("/", StaticFiles(directory=settings.static_dir, html=True), name="static")
