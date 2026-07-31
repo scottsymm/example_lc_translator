@@ -1,0 +1,9 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: packages/lc-translator-api/Dockerfile
+    ports:
+      - "8000:8000"
+    environment:
+      LC_TRANSLATOR_STATIC_DIR: /app/apps/web/dist
