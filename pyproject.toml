@@ -1,16 +1,14 @@
 [project]
-name = "lc-translator"
-version = "0.1.0"
-description = "MT700 to camt.087 Letter of Credit translation demo"
+name = "lc-translator-monorepo"
+version = "0.2.0"
+description = "Monorepo for the LC Translator engine, API, and web UI"
 requires-python = ">=3.9"
-authors = [{ name = "Your Name", email = "you@example.com" }]
 readme = "README.md"
 license = { text = "MIT" }
+
 dependencies = [
-    "pydantic>=2.0",
-    "lxml>=4.9",
-    "faker>=20.0",
-    "typer>=0.9",
+    "lc-translator-core",
+    "lc-translator-api",
 ]
 
 [project.optional-dependencies]
@@ -20,14 +18,15 @@ dev = [
     "freezegun>=1.0",
     "ruff>=0.1.0",
     "mypy>=1.0",
+    "httpx>=0.27",
 ]
 
-[project.scripts]
-lc-translator = "lc_translator.cli:app"
+[tool.uv.workspace]
+members = ["packages/*"]
 
-[build-system]
-requires = ["hatchling"]
-build-backend = "hatchling.build"
+[tool.uv.sources]
+lc-translator-core = { workspace = true }
+lc-translator-api = { workspace = true }
 
 [tool.ruff]
 line-length = 100
@@ -58,10 +57,9 @@ plugins = ["pydantic.mypy"]
 [[tool.mypy.overrides]]
 module = ["tests.*", "lxml.*"]
 ignore_missing_imports = true
-
 disallow_untyped_defs = false
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["packages"]
 python_files = ["test_*.py"]
-addopts = "--cov=lc_translator --cov-report=term-missing"
+addopts = "--cov=lc_translator_core --cov=lc_translator_api --cov-report=term-missing"

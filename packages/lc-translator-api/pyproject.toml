@@ -1,0 +1,29 @@
+[project]
+name = "lc-translator-api"
+version = "0.2.0"
+description = "FastAPI REST service for the LC Translator engine"
+requires-python = ">=3.9"
+readme = "README.md"
+license = { text = "MIT" }
+dependencies = [
+    "lc-translator-core",
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.29",
+    "pydantic-settings>=2.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "httpx>=0.27",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.uv.sources]
+lc-translator-core = { workspace = true }
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/lc_translator_api"]
