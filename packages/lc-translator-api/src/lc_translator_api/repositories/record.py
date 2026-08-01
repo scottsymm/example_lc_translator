@@ -6,7 +6,7 @@ from datetime import datetime, timezone
 from typing import Optional
 
 from sqlalchemy.orm import Session
-from uuid_extensions import uuid7str
+from uuid_extensions import uuid7str  # type: ignore[import-untyped]
 
 from lc_translator_api.models.record import LCRecord
 from lc_translator_api.schemas.record import RecordCreate, RecordUpdate
@@ -16,6 +16,7 @@ class RecordRepository:
     """CRUD and query operations for LCRecord."""
 
     def __init__(self, session: Session) -> None:
+        """Initialize with a SQLAlchemy session."""
         self._session = session
 
     def create(self, data: RecordCreate) -> LCRecord:

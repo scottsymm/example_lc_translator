@@ -1,12 +1,15 @@
 """Tests for API health endpoint."""
 
-from fastapi.testclient import TestClient
-from sqlalchemy import StaticPool, create_engine, text
-from sqlalchemy.orm import Session, sessionmaker
+from __future__ import annotations
 
+from collections.abc import Generator
+
+from fastapi.testclient import TestClient
 from lc_translator_api.dependencies import get_db
 from lc_translator_api.main import create_app
 from lc_translator_api.models.record import Base
+from sqlalchemy import StaticPool, create_engine
+from sqlalchemy.orm import Session, sessionmaker
 
 _engine = create_engine(
     "sqlite:///:memory:",
@@ -18,7 +21,7 @@ Base.metadata.create_all(bind=_engine)
 _TestSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=_engine)
 
 
-def _override_get_db() -> Session:
+def _override_get_db() -> Generator[Session, None, None]:
     session = _TestSessionLocal()
     try:
         yield session

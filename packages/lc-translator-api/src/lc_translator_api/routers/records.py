@@ -91,10 +91,10 @@ def rerun_record(record_id: str, repo: RecordRepository = Depends(_get_repositor
         return generate_endpoint(GenerateRequest(seed=record.generated_seed, strict=record.generated_strict))
 
     if record.source_type in {"translated", "validated"}:
-        from lc_translator_api.routers.translate import translate_endpoint
+        from lc_translator_api.routers.translate import mt_to_mx_endpoint
 
         if record.mt700_input is None:
             raise HTTPException(status_code=400, detail="Record missing MT700 input")
-        return translate_endpoint(TranslateRequest(mt700=record.mt700_input))
+        return mt_to_mx_endpoint(TranslateRequest(mt700=record.mt700_input))
 
     raise HTTPException(status_code=400, detail=f"Unsupported source_type: {record.source_type}")

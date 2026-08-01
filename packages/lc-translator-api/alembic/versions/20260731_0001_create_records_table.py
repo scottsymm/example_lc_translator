@@ -1,4 +1,4 @@
-"""create records table
+"""Create records table.
 
 Revision ID: 20260731_0001
 Revises:
@@ -7,20 +7,18 @@ Create Date: 2026-07-31 00:00:00.000000
 """
 from __future__ import annotations
 
-from typing import Sequence, Union
-
-from alembic import op
 import sqlalchemy as sa
-
+from alembic import op
 
 # revision identifiers, used by Alembic.
 revision: str = "20260731_0001"
-down_revision: Union[str, None] = None
-branch_labels: Union[str, Sequence[str], None] = None
-depends_on: Union[str, Sequence[str], None] = None
+down_revision: str | None = None
+branch_labels: str | list[str] | None = None
+depends_on: str | list[str] | None = None
 
 
 def upgrade() -> None:
+    """Create the records table and indexes."""
     op.create_table(
         "records",
         sa.Column("id", sa.String(36), primary_key=True),
@@ -40,6 +38,7 @@ def upgrade() -> None:
 
 
 def downgrade() -> None:
+    """Drop the records table and indexes."""
     op.drop_index("ix_records_source_type", table_name="records")
     op.drop_index("ix_records_created_at", table_name="records")
     op.drop_table("records")

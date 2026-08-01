@@ -2,17 +2,18 @@
 
 from __future__ import annotations
 
+from collections.abc import Generator
+
 import pytest
+from lc_translator_api.models.record import Base
+from lc_translator_api.repositories.record import RecordRepository
+from lc_translator_api.schemas.record import RecordCreate, ValidationResult
 from sqlalchemy import create_engine
 from sqlalchemy.orm import Session, sessionmaker
 
-from lc_translator_api.models.record import Base, LCRecord
-from lc_translator_api.repositories.record import RecordRepository
-from lc_translator_api.schemas.record import RecordCreate, ValidationResult
-
 
 @pytest.fixture
-def db_session() -> Session:
+def db_session() -> Generator[Session, None, None]:
     """Create an in-memory SQLite DB and yield a session."""
     engine = create_engine("sqlite:///:memory:", future=True)
     Base.metadata.create_all(bind=engine)
