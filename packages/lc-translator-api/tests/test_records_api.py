@@ -98,3 +98,30 @@ def test_delete_record() -> None:
     response = client.delete(f"/api/records/{created['id']}")
     assert response.status_code == 204
     assert client.get(f"/api/records/{created['id']}").status_code == 404
+
+
+def test_rerun_generated_record() -> None:
+    """Test POST /records/{id}/rerun re-runs a generated record."""
+    created = client.post("/api/records", json=_sample_payload()).json()
+    response = client.post(f"/api/records/{created['id']}/rerun")
+    assert response.status_code == 200
+    data = response.json()
+    assert ":20:" in data["mt700"]
+    assert "<Document" in data["mx_xml"]
+
+
+def test_rerun_translated_record() -> None:
+    """Test POST /records/{id}/rerun re-runs a translated record."""
+    client.post("/api/generate", json={"seed": 42})
+    generate_response = client.post("/api/generate", json={"seed": 42}).json()
+    created = client.post(
+        "/api/records",
+        json={
+            "source_type": "translated",
+            "mt700_input": generate_response["mt700"],
+        },
+    ).json()
+    response = client.post(f"/api/records/{created['id']}/rerun")
+    assert response.status_code == 200
+    data = response.json()
+    assert "<Document" in data["mx_xml"]
