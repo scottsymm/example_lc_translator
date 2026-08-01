@@ -6,12 +6,11 @@ from collections.abc import Generator
 from typing import Any
 
 from fastapi.testclient import TestClient
-from sqlalchemy import StaticPool, create_engine
-from sqlalchemy.orm import Session, sessionmaker
-
 from lc_translator_api.dependencies import get_db
 from lc_translator_api.main import create_app
 from lc_translator_api.models.record import Base
+from sqlalchemy import StaticPool, create_engine
+from sqlalchemy.orm import Session, sessionmaker
 
 _engine = create_engine(
     "sqlite:///:memory:",
