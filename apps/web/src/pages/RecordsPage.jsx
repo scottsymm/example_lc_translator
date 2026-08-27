@@ -25,8 +25,12 @@ export function RecordsPage() {
 
   async function handleDelete(id) {
     if (!confirm("Delete this record?")) return;
-    await deleteRecord(id);
-    setRecords((prev) => prev.filter((r) => r.id !== id));
+    try {
+      await deleteRecord(id);
+      setRecords((prev) => prev.filter((r) => r.id !== id));
+    } catch (err) {
+      setError(err.message);
+    }
   }
 
   if (loading) return <p className="p-4">Loading...</p>;
