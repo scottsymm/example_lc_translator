@@ -1,13 +1,15 @@
 # lc-translator
 
-A full-stack demonstration monorepo that translates a Letter of Credit (LC) from the legacy SWIFT MT700 format to the ISO 20022 `tsrv.001` (Undertaking Issuance) XML format.
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)]()
+[![React](https://img.shields.io/badge/React-20232A?logo=react&logoColor=61DAFB)]()
 
-It now includes:
-- **lc-translator-core** — reusable Python engine (CLI included)
-- **lc-translator-api** — FastAPI REST service
-- **web** — React 19 + Vite + Tailwind CSS frontend
+A hands-on demonstration of bridging legacy trade-finance messaging to modern ISO 20022 XML. It takes a SWIFT MT700 documentary credit, parses it into an agnostic domain model, and emits a validated ISO 20022 `tsrv.001` (Undertaking Issuance) XML document.
 
-This project is built for senior-developer and CTO-level demos. It showcases a `uv` + `pnpm` monorepo, Pydantic domain modeling, best-effort parsing, explicit MT-to-MX mapping, and XSD validation against a real ISO 20022 schema.
+This is intentionally demo-grade code: it shows a clean vertical slice of a financial message-transformation pipeline using a `uv` + `pnpm` monorepo, Pydantic modeling, explicit field mapping, and real XSD validation.
+
+![LC Translator Generate page](screenshot.png)
 
 ## What it does
 
@@ -23,6 +25,21 @@ Agnostic LC model → MT700 text → Agnostic LC model → tsrv.001 XML → vali
 4. **Map** LC fields to ISO 20022 `tsrv.001` nodes.
 5. **Generate** the ISO 20022 XML document.
 6. **Validate** the MT700 structure and the MX XML against the bundled official `tsrv.001` XSD.
+
+### Example
+
+Given an MT700 fragment like:
+
+```text
+:20:LC123456789
+:31C:260101
+:31D:260615
+:50:Acme Exporters Inc.
+:59:Global Importers Ltd
+:32B:USD100000,
+```
+
+The pipeline maps it into `tsrv.001.001.01` XML containing `<UdrtkgIssnc>`, `<Issr>`, `<Bnfcry>`, and `<UdrtkgAmt Ccy="USD">100000</UdrtkgAmt>`, then validates it against the bundled XSD.
 
 ## Architecture
 
@@ -54,6 +71,17 @@ uv sync --extra dev
 pnpm install
 uv run lc-translator generate --seed 42
 ```
+
+No PostgreSQL is required for the quick start above — the core pipeline and CLI run entirely in-process.
+
+## Environment variables
+
+| Variable | Default | Purpose |
+|---|---|---|
+| `LC_TRANSLATOR_DATABASE_URL` | `postgresql+psycopg://postgres:postgres@localhost:5432/lc_translator` | PostgreSQL connection string. Only needed for the Records API. |
+| `LC_TRANSLATOR_XSD_PATH` | bundled `tsrv.001.001.01.xsd` | Path to an alternative ISO 20022 XSD file. |
+| `LC_TRANSLATOR_STATIC_DIR` | none | Directory to serve the built React UI from the API container. |
+| `LC_TRANSLATOR_CORS_ORIGINS` | `http://localhost:5173` | Allowed CORS origins for the API. |
 
 ## Development
 
@@ -139,7 +167,9 @@ This starts PostgreSQL, runs Alembic migrations automatically, and serves the bu
 
 ## Storage
 
-LC Translator persists translation records in PostgreSQL. The Docker Compose setup above is the fastest way to run everything together. For local development with your own Postgres:
+The Records API persists saved translations in PostgreSQL. If you only use the CLI or the Generate/Translate/Validate features, **you do not need a database**.
+
+To run the full stack with records support, Docker Compose is the fastest path. For local development with your own Postgres:
 
 ```bash
 export LC_TRANSLATOR_DATABASE_URL=postgresql+psycopg://user:pass@localhost:5432/lc_translator
@@ -157,6 +187,9 @@ pnpm --filter web test
 
 # All web tests from root
 pnpm run test:web
+
+# Run everything
+uv run pytest && pnpm run test:web
 ```
 
 ## Linting and formatting
@@ -178,8 +211,6 @@ export LC_TRANSLATOR_XSD_PATH=/path/to/tsrv.001.001.01.xsd
 uv run lc-translator generate --seed 42
 ```
 
-The `packages/lc-translator-core/scripts/fetch_xsd.py` helper can also download a schema URL.
-
 ## Business domain
 
 - **MT700** — SWIFT "Issue of a Documentary Credit". Block-text tags such as `:20:`, `:31C:`, `:31D:`, `:50:`, `:59:`, and `:32B:` carry the LC data.
@@ -190,3 +221,7 @@ The `packages/lc-translator-core/scripts/fetch_xsd.py` helper can also download 
 - Target Python version is **3.9+** so it runs on stock macOS Python.
 - The parser is best-effort: it recovers whatever it can and reports what it could not.
 - The bundled XSD is the official `tsrv.001.001.01` schema from the ISO 20022 Trade Services business area archive. It validates the generated XML against the real global standard.
+
+## License
+
+This project is released under the [MIT License](LICENSE).
