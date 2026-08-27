@@ -17,8 +17,8 @@ async function fetchJson(path, options = {}) {
 
 export function listRecords(params = {}) {
   const search = new URLSearchParams();
-  if (params.offset) search.set("offset", String(params.offset));
-  if (params.limit) search.set("limit", String(params.limit));
+  if (params.offset !== undefined) search.set("offset", String(params.offset));
+  if (params.limit !== undefined) search.set("limit", String(params.limit));
   if (params.source_type) search.set("source_type", params.source_type);
   return fetchJson(`/records?${search.toString()}`);
 }
