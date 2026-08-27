@@ -178,8 +178,6 @@ export LC_TRANSLATOR_XSD_PATH=/path/to/tsrv.001.001.01.xsd
 uv run lc-translator generate --seed 42
 ```
 
-The `packages/lc-translator-core/scripts/fetch_xsd.py` helper can also download a schema URL.
-
 ## Business domain
 
 - **MT700** — SWIFT "Issue of a Documentary Credit". Block-text tags such as `:20:`, `:31C:`, `:31D:`, `:50:`, `:59:`, and `:32B:` carry the LC data.
@@ -190,3 +188,8 @@ The `packages/lc-translator-core/scripts/fetch_xsd.py` helper can also download 
 - Target Python version is **3.9+** so it runs on stock macOS Python.
 - The parser is best-effort: it recovers whatever it can and reports what it could not.
 - The bundled XSD is the official `tsrv.001.001.01` schema from the ISO 20022 Trade Services business area archive. It validates the generated XML against the real global standard.
+
+## License
+
+This project is released under the [MIT License](LICENSE).
+
