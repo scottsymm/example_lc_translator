@@ -56,9 +56,6 @@ export default function TranslatePage() {
                 mt700_input: mt700,
                 mx_xml: result.mx_xml,
                 validation_result: {
-                  mt700_valid: true,
-                  mt700_errors: result.errors,
-                  mt700_warnings: result.warnings,
                   mx_valid: result.mx_valid,
                   mx_errors: result.mx_errors,
                 },
