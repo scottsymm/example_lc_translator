@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { translateMtToMx } from "../api/client.js";
-import { saveToHistory } from "../lib/history.js";
+import { SaveRecordButton } from "../components/SaveRecordButton.jsx";
 import MessageBlock from "../components/MessageBlock.jsx";
 import ValidationResult from "../components/ValidationResult.jsx";
-import HistoryPanel from "../components/HistoryPanel.jsx";
 
 export default function TranslatePage() {
   const [mt700, setMt700] = useState("");
@@ -17,11 +16,6 @@ export default function TranslatePage() {
     try {
       const data = await translateMtToMx(mt700);
       setResult(data);
-      saveToHistory("translate", {
-        mt700,
-        mx_xml: data.mx_xml,
-        mx_valid: data.mx_valid,
-      });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -55,6 +49,19 @@ export default function TranslatePage() {
 
       {result && (
         <>
+          <div className="mt-4">
+            <SaveRecordButton
+              record={{
+                source_type: "translated",
+                mt700_input: mt700,
+                mx_xml: result.mx_xml,
+                validation_result: {
+                  mx_valid: result.mx_valid,
+                  mx_errors: result.mx_errors,
+                },
+              }}
+            />
+          </div>
           <ValidationResult result={{ valid: result.mx_valid, errors: result.mx_errors }} title="MX XSD Validation" />
           {result.errors?.length > 0 && (
             <ValidationResult result={{ valid: false, errors: result.errors }} title="Translation Errors" />
@@ -65,14 +72,6 @@ export default function TranslatePage() {
           <MessageBlock title="MX XML" text={result.mx_xml} />
         </>
       )}
-
-      <HistoryPanel
-        type="translate"
-        onSelect={(payload) => {
-          setMt700(payload.mt700);
-          setResult({ mx_xml: payload.mx_xml, mx_valid: payload.mx_valid, errors: [], warnings: [], mx_errors: [] });
-        }}
-      />
     </div>
   );
 }

@@ -35,4 +35,4 @@ RUN pnpm --filter web build
 ENV LC_TRANSLATOR_STATIC_DIR=/app/apps/web/dist
 EXPOSE 8000
 
-CMD ["uv", "run", "--package", "lc-translator-api", "uvicorn", "lc_translator_api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["sh", "-c", "uv run --package lc-translator-api lc-translator-api-migrate && uv run --package lc-translator-api uvicorn lc_translator_api.main:app --host 0.0.0.0 --port 8000"]

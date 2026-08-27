@@ -1,9 +1,8 @@
 import { useState } from "react";
 import { generateLc } from "../api/client.js";
-import { saveToHistory } from "../lib/history.js";
+import { SaveRecordButton } from "../components/SaveRecordButton.jsx";
 import MessageBlock from "../components/MessageBlock.jsx";
 import ValidationResult from "../components/ValidationResult.jsx";
-import HistoryPanel from "../components/HistoryPanel.jsx";
 
 export default function GeneratePage() {
   const [seed, setSeed] = useState("");
@@ -17,13 +16,6 @@ export default function GeneratePage() {
     try {
       const data = await generateLc(seed ? Number(seed) : undefined);
       setResult(data);
-      saveToHistory("generate", {
-        lc_number: data.lc_number,
-        mt700: data.mt700,
-        mx_xml: data.mx_xml,
-        mt700_valid: data.mt700_valid,
-        mx_valid: data.mx_valid,
-      });
     } catch (err) {
       setError(err.message);
     } finally {
@@ -60,6 +52,23 @@ export default function GeneratePage() {
 
       {result && (
         <>
+          <div className="mt-4">
+            <SaveRecordButton
+              record={{
+                source_type: "generated",
+                generated_seed: seed ? Number(seed) : null,
+                generated_strict: false,
+                mx_xml: result.mx_xml,
+                validation_result: {
+                  mt700_valid: result.mt700_valid,
+                  mt700_errors: result.mt700_errors,
+                  mt700_warnings: result.mt700_warnings,
+                  mx_valid: result.mx_valid,
+                  mx_errors: result.mx_errors,
+                },
+              }}
+            />
+          </div>
           <ValidationResult
             result={{ valid: result.mt700_valid, errors: result.mt700_errors, warnings: result.mt700_warnings }}
             title="MT700 Structure"
@@ -72,22 +81,6 @@ export default function GeneratePage() {
           <MessageBlock title="MX XML" text={result.mx_xml} />
         </>
       )}
-
-      <HistoryPanel
-        type="generate"
-        onSelect={(payload) =>
-          setResult({
-            lc_number: payload.lc_number,
-            mt700: payload.mt700,
-            mx_xml: payload.mx_xml,
-            mt700_valid: payload.mt700_valid,
-            mt700_errors: [],
-            mt700_warnings: [],
-            mx_valid: payload.mx_valid,
-            mx_errors: [],
-          })
-        }
-      />
     </div>
   );
 }

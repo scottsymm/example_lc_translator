@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
 from lc_translator_core.mt700 import Mt700Validator
 from lc_translator_core.validation import XsdValidationError, XsdValidator
+from sqlalchemy import text
+from sqlalchemy.orm import Session
 
+from lc_translator_api.dependencies import get_db
 from lc_translator_api.schemas.validate import (
     ValidateMtRequest,
     ValidateMtResponse,
@@ -45,6 +48,10 @@ def validate_mx_endpoint(request: ValidateMxRequest) -> ValidateMxResponse:
 
 
 @router.get("/health")
-def health_endpoint() -> dict[str, str]:
-    """Health check."""
-    return {"status": "ok"}
+def health_endpoint(db: Session = Depends(get_db)) -> dict[str, str]:
+    """Health check, including database connectivity."""
+    try:
+        db.execute(text("SELECT 1"))
+        return {"status": "ok", "database": "ok"}
+    except Exception:
+        return {"status": "ok", "database": "error"}

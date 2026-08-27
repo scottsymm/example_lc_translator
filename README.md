@@ -102,19 +102,26 @@ Then open http://localhost:8000.
 
 | Method | Path | Description |
 |---|---|---|
-| `GET` | `/api/health` | Health check |
+| `GET` | `/api/health` | Health check (includes DB status) |
 | `POST` | `/api/generate` | Generate LC and run full pipeline |
 | `POST` | `/api/mt-to-mx` | Translate MT700 text to MX XML |
 | `POST` | `/api/validate-mt` | Validate MT700 structure |
 | `POST` | `/api/validate-mx` | Validate MX XML against XSD |
+| `POST` | `/api/records` | Save a record |
+| `GET` | `/api/records` | List saved records |
+| `GET` | `/api/records/{id}` | Fetch a record |
+| `PUT` | `/api/records/{id}` | Update record title |
+| `DELETE` | `/api/records/{id}` | Delete a record |
+| `POST` | `/api/records/{id}/rerun` | Re-run stored input |
 
 ## Web UI
 
-The React app runs at `http://localhost:5173` in development. It has three views:
+The React app runs at `http://localhost:5173` in development. It has four views:
 
 - **Generate** — generate a fake LC and view MT700 + MX output
 - **Translate** — paste MT700 text and convert to MX XML
 - **Validate** — validate MT700 structure or MX XML
+- **Records** — saved translation/generation records with delete support
 
 Recent results are stored in the browser's `localStorage` (up to 10 entries) so you can revisit them during the session.
 
@@ -127,6 +134,17 @@ docker compose up --build
 ```
 
 Then open http://localhost:8000.
+
+This starts PostgreSQL, runs Alembic migrations automatically, and serves the built React UI from the FastAPI container.
+
+## Storage
+
+LC Translator persists translation records in PostgreSQL. The Docker Compose setup above is the fastest way to run everything together. For local development with your own Postgres:
+
+```bash
+export LC_TRANSLATOR_DATABASE_URL=postgresql+psycopg://user:pass@localhost:5432/lc_translator
+uv run --package lc-translator-api alembic upgrade head
+```
 
 ## Testing
 

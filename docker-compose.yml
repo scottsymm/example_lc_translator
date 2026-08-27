@@ -1,4 +1,20 @@
 services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: lc_translator
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
   api:
     build:
       context: .
@@ -7,3 +23,10 @@ services:
       - "8000:8000"
     environment:
       LC_TRANSLATOR_STATIC_DIR: /app/apps/web/dist
+      LC_TRANSLATOR_DATABASE_URL: postgresql+psycopg://postgres:postgres@db:5432/lc_translator
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
