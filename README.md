@@ -5,7 +5,9 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)]()
 [![React](https://img.shields.io/badge/React-20232A?logo=react&logoColor=61DAFB)]()
 
-A hands-on demonstration of bridging legacy trade-finance messaging to modern ISO 20022 XML. It takes a SWIFT MT700 documentary credit, parses it into an agnostic domain model, and emits a validated ISO 20022 `tsrv.001` (Undertaking Issuance) XML document.
+I had a meeting with a trade finance company that specializes in managing trade documents, and wanted to learn more about their stack and demonstrate a way to use AI enablement to investigate a simple feature. Lately, I have been using node and typescript and react, so, I wanted to use some of their stack choices: python, javascript, and react. It uses a monorepo-style setup with `uv` and `pnpm`.
+
+This is a hands-on demonstration of bridging legacy trade-finance messaging to modern ISO 20022 XML. It takes a SWIFT MT700 documentary credit, parses it into an agnostic domain model, and emits a validated ISO 20022 `tsrv.001` (Undertaking Issuance) XML document.
 
 This is intentionally demo-grade code: it shows a clean vertical slice of a financial message-transformation pipeline using a `uv` + `pnpm` monorepo, Pydantic modeling, explicit field mapping, and real XSD validation.
 
